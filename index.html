@@ -35,8 +35,8 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="icon" href="Data/profile.jpg">
-    <link rel="apple-touch-icon" href="Data/profile.jpg">
+    <link rel="icon" href="./Data/profile.png">
+    <link rel="apple-touch-icon" href="./Data/profile.png">
     
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -117,7 +117,7 @@
                 <div class="hero-visual">
                     <div class="profile-container">
                         <div class="profile-image">
-                            <img src="Data/profile.jpg" alt="OMGBLADE Profile" id="profile-img">
+                            <img src="./Data/profile.png" alt="OMGBLADE Profile" id="profile-img">
                             <div class="profile-ring"></div>
                         </div>
                         <br><br><br>
@@ -151,9 +151,7 @@
         
         <!-- Background elements -->
         <div class="hero-bg">
-            <div class="gradient-orb orb-1"></div>
-            <div class="gradient-orb orb-2"></div>
-            <div class="gradient-orb orb-3"></div>
+            <!-- Gradient orbs removed -->
         </div>
     </section>
 
@@ -292,113 +290,159 @@
                 <p class="section-subtitle">A showcase of my creative work and collaborations</p>
             </div>
             
+            <!-- Portfolio Filter Buttons -->
             <div class="portfolio-filters">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="video">Video Editing</button>
-                <button class="filter-btn" data-filter="design">Graphic Design</button>
+                <button class="filter-btn" data-filter="design">Graphic Work</button>
                 <button class="filter-btn" data-filter="videography">Videography</button>
+                <button class="filter-btn" data-filter="photography">Photography</button>
             </div>
             
+            <!-- Portfolio Grid -->
             <div class="portfolio-grid">
                 <div class="portfolio-item" data-category="video">
                     <div class="portfolio-image">
-                        <div class="video-container">
-                            <video class="portfolio-video" loop playsinline preload="metadata" muted webkit-playsinline>
-                                <source src="./Data/videos/Videoedit1.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                            <div class="video-controls">
-                                <button class="video-play-btn" aria-label="Play/Pause">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                                <button class="video-sound-btn" aria-label="Toggle Sound">
-                                    <i class="fas fa-volume-mute"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="portfolio-content">
-                            <h4>YouTube Short Video</h4>
-                            <p>Cashcow Video for a Private Customer</p>
-                            <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                        </div>
+                        <video src="./Data/videos/Videoedit1.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Short Edit 1</h4>
+                        <p>Creative video editing sample</p>
                     </div>
                 </div>
                 
-                <div class="portfolio-item" data-category="design">
-                    <div class="portfolio-image">
-                        <img src="https://via.placeholder.com/400x300/1a1a1a/4A90E2?text=Design+Project+1" alt="Design Project 1">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-content">
-                                <h4>Brand Identity Design</h4>
-                                <p>Complete visual identity system</p>
-                                <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
+                <!-- Videography Portfolio -->
                 <div class="portfolio-item" data-category="videography">
                     <div class="portfolio-image">
-                        <div class="video-container">
-                            <video class="portfolio-video" loop playsinline preload="auto" muted webkit-playsinline x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait">
-                                <source src="Data/videos/videography1.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                            <div class="video-controls">
-                                <button class="video-play-btn" aria-label="Play/Pause">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                                <button class="video-sound-btn" aria-label="Toggle Sound">
-                                    <i class="fas fa-volume-mute"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="portfolio-content">
-                            <h4>Event Documentation</h4>
-                            <p>Capturing memorable moments</p>
-                            <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                        </div>
+                        <video src="./Data/videos/videoedit2.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
                     </div>
                 </div>
-                
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/004.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/003.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/002.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/001.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/videoedit5.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads Creation</h4>
+                        <p>Creating engaging ads for Meta</p>
+                    </div>
+                </div>
+
                 <div class="portfolio-item" data-category="video">
                     <div class="portfolio-image">
-                        <img src="https://via.placeholder.com/400x300/1a1a1a/4A90E2?text=Video+Project+2" alt="Video Project 2">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-content">
-                                <h4>Social Media Campaign</h4>
-                                <p>Engaging content for digital platforms</p>
-                                <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                            </div>
-                        </div>
+                        <video src="./Data/videos/videoedit3.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Short Edit 2</h4>
+                        <p>Creative video editing sample</p>
                     </div>
                 </div>
-                
-                <div class="portfolio-item" data-category="design">
-                    <div class="portfolio-image">
-                        <img src="https://via.placeholder.com/400x300/1a1a1a/gold?text=Design+Project+2" alt="Design Project 2">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-content">
-                                <h4>Marketing Materials</h4>
-                                <p>Print and digital design solutions</p>
-                                <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="portfolio-item" data-category="videography">
                     <div class="portfolio-image">
-                        <img src="https://via.placeholder.com/400x300/1a1a1a/4A90E2?text=Videography+2" alt="Videography Project 2">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-content">
-                                <h4>Product Showcase</h4>
-                                <p>Professional product videography</p>
-                                <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
-                            </div>
-                        </div>
+                        <video src="./Data/videos/videography3.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads content</h4>
+                        <p>Creative video shot & Editing. Client assure Creation</p>
                     </div>
                 </div>
+                <div class="portfolio-item" data-category="videography">
+                    <div class="portfolio-image">
+                        <video src="./Data/videos/videography2.mp4" controls width="100%" height="auto" autoplay loop muted ></video>
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Meta Ads content</h4>
+                        <p>Creative video shot & Editing. Client assure Creation</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="design">
+                    <div class="portfolio-image">
+                        <img src="./Data/logo.png" alt="Logo Creation">
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Logo Creation</h4>
+                        <p>For a Private Happy Customer</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="design">
+                    <div class="portfolio-image">
+                        <img src="./Data/vector.png" alt="Vector Tracing">
+                    </div>
+                    <div class="portfolio-content">
+                        <h4>Vector Tracing</h4>
+                        <p>From a simple and complex image to Print-Ready Solution</p>
+                        <!-- //Share Icon Hide -->
+                        <!-- <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a> -->
+                    </div>
+                </div>
+                
+
+                <!-- Photography Portfolio -->
+                <div class="portfolio-item" data-category="photography">
+                    <div class="portfolio-image">
+                            <img src="./Data/pictures/1.webp" alt="Mobile Photography">
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="photography">
+                    <div class="portfolio-image">
+                            <img src="./Data/pictures/2.webp" alt="Mobile Photography">
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="photography">
+                    <div class="portfolio-image">
+                            <img src="./Data/pictures/3.webp" alt="Mobile Photography">
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="photography">
+                    <div class="portfolio-image">
+                            <img src="./Data/pictures/4.webp" alt="Mobile Photography">
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="photography">
+                    <div class="portfolio-image">
+                            <img src="./Data/pictures/5.webp" alt="Mobile Photography">
+                    </div>
+                </div>
+                
             </div>
         </div>
     </section>
@@ -602,8 +646,8 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <span class="logo-text">OMGBLADE</span>
-                    <p>Creative Visual Storyteller</p>
+                    <span class="logo-text">OMG BLADE</span>
+                    <p>Success Born From Creativity</p>
                 </div>
                 <div class="footer-links">
                     <a href="#home">Home</a>
@@ -634,6 +678,8 @@
 
     <!-- Video.js & Playlist scripts -->
     <script src="https://vjs.zencdn.net/8.13.0/video.min.js"></script>
+    <!-- Video.js YouTube tech -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-youtube/3.0.1/Youtube.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-playlist/5.0.0/videojs-playlist.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-playlist-ui/5.0.0/videojs-playlist-ui.min.js"></script>
     <script src="script.js"></script>

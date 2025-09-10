@@ -49,18 +49,6 @@ function initializeWebsite() {
 	initTypewriterEffect();
 	initScrollAnimations();
 	initPortfolioFilters();
-	initCustomSelect();
-	// Initialize testimonials slider
-	initTestimonialsSlider();
-	
-	// Initialize contact form
-	initContactForm();
-	
-	// Initialize stats counter
-	initStatsCounter();
-	
-	// Initialize skill bars
-	initSkillBars();
 	
 	// Initialize portfolio videos after the page is fully loaded
 	window.addEventListener('load', function() {
@@ -195,11 +183,19 @@ function initVideoJsPlayer() {
     const playlistContainer = document.getElementById('vjsPlaylist');
     if (!overlay || !vjsEl) return;
 
-    // Collect sources from portfolio videos
+    // Collect sources: prefer YouTube IDs via data attribute, fallback to local mp4
     const items = Array.from(document.querySelectorAll('.portfolio-item'));
     const videos = items.map((item) => {
-        const source = item.querySelector('.portfolio-video source');
         const title = item.querySelector('.portfolio-content h4')?.textContent?.trim() || 'Untitled';
+        const ytId = item.getAttribute('data-youtube-id');
+        if (ytId) {
+            return {
+                name: title,
+                poster: `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`,
+                sources: [{ src: `https://www.youtube.com/watch?v=${ytId}`, type: 'video/youtube' }]
+            };
+        }
+        const source = item.querySelector('.portfolio-video source');
         const src = source?.getAttribute('src');
         return src ? { name: title, sources: [{ src, type: 'video/mp4' }] } : null;
     }).filter(Boolean);
@@ -212,6 +208,7 @@ function initVideoJsPlayer() {
         preload: 'metadata',
         fluid: true,
         playbackRates: [0.5, 1, 1.25, 1.5, 2],
+        techOrder: ['youtube', 'html5']
     });
 
     if (window.videojsPlaylist) {
@@ -468,8 +465,8 @@ function initTypewriterEffect() {
         'Graphic Designer',
         'Colour Grader',
         'Videographer',
-        'Motion Graphics Artist',
-        'Creative Director'
+        'Social Media Manager',
+        'Photographer'
     ];
     
     let currentProfessionIndex = 0;
@@ -602,14 +599,52 @@ function initScrollAnimations() {
 function initPortfolioFilters() {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const portfolioItems = document.querySelectorAll('.portfolio-item');
-    
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
+
+    // Filter function
+    function filterPortfolio(category) {
+        portfolioItems.forEach(item => {
+            if (category === 'all' || item.getAttribute('data-category') === category) {
+                item.classList.remove('hide');
+                setTimeout(() => {
+                    item.style.display = 'block';
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'scale(1)';
+                    }, 50);
+                }, 50);
+            } else {
+                item.style.opacity = '0';
+                item.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    item.style.display = 'none';
+                    item.classList.add('hide');
+                }, 300);
+            }
+        });
+    }
+
+    // Add click event to filter buttons
+    filterBtns.forEach(button => {
+        button.addEventListener('click', () => {
             // Remove active class from all buttons
-            filterBtns.forEach(b => b.classList.remove('active'));
+            filterBtns.forEach(btn => btn.classList.remove('active'));
             // Add active class to clicked button
-            btn.classList.add('active');
-            
+            button.classList.add('active');
+            // Filter items
+            filterPortfolio(button.getAttribute('data-filter'));
+        });
+    });
+
+    // Portfolio hover effect
+    portfolioItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            item.style.transform = 'scale(1.02)';
+            item.style.boxShadow = '0 20px 40px rgba(255, 215, 0, 0.2)';
+        });
+
+        item.addEventListener('mouseleave', () => {
+            item.style.transform = 'scale(1)';
+            item.style.boxShadow = 'none';
             const filter = btn.getAttribute('data-filter');
             
             portfolioItems.forEach(item => {
@@ -760,317 +795,10 @@ function handleSwipe() {
         } else {
             prevTestimonial();
         }
-        resetAutoSlide();
     }
 }
 
-// Custom Select Dropdown
-function initCustomSelect() {
-    console.log('Initializing custom select...');
-    const customSelect = document.querySelector('.custom-select');
-    
-    if (!customSelect) {
-        console.log('Custom select not found');
-        return;
-    }
-    
-    const selected = customSelect.querySelector('.select-selected');
-    const items = customSelect.querySelector('.select-items');
-    const hiddenInput = customSelect.parentElement.querySelector('input[type="hidden"]');
-    
-    console.log('Elements found:', { selected, items, hiddenInput });
-    
-    if (!selected || !items) {
-        console.log('Required elements not found');
-        return;
-    }
-    
-    // Remove any existing event listeners by cloning the element
-    const newSelected = selected.cloneNode(true);
-    selected.parentNode.replaceChild(newSelected, selected);
-    
-    // Click handler for the select box
-    newSelected.addEventListener('click', function(e) {
-        console.log('Dropdown clicked!');
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Force show/hide the dropdown
-        if (items.style.display === 'none' || items.classList.contains('select-hide')) {
-            console.log('Opening dropdown');
-            items.style.display = 'block';
-            items.classList.remove('select-hide');
-            newSelected.classList.add('select-arrow-active');
-        } else {
-            console.log('Closing dropdown');
-            items.style.display = 'none';
-            items.classList.add('select-hide');
-            newSelected.classList.remove('select-arrow-active');
-        }
-    });
-    
-    // Click handlers for options
-    items.querySelectorAll('div').forEach(option => {
-        option.addEventListener('click', function(e) {
-            console.log('Option clicked:', this.textContent);
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const value = this.getAttribute('data-value');
-            const text = this.textContent;
-            
-            // Update display and hidden input
-            newSelected.textContent = text;
-            if (hiddenInput) {
-                hiddenInput.value = value;
-            }
-            
-            // Close dropdown
-            items.style.display = 'none';
-            items.classList.add('select-hide');
-            newSelected.classList.remove('select-arrow-active');
-        });
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!customSelect.contains(e.target)) {
-            items.style.display = 'none';
-            items.classList.add('select-hide');
-            newSelected.classList.remove('select-arrow-active');
-        }
-    });
-    
-    console.log('Custom select initialized successfully');
-}
-
-function closeAllSelect(elmnt) {
-    const items = document.querySelectorAll('.select-items');
-    const selected = document.querySelectorAll('.select-selected');
-    
-    items.forEach((item, index) => {
-        if (elmnt !== item.parentElement) {
-            item.classList.add('select-hide');
-            selected[index].classList.remove('select-arrow-active');
-        }
-    });
-}
-
-// Contact Form
-function initContactForm() {
-    document.querySelector('.contact-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(this);
-        const name = formData.get('name');
-        const email = formData.get('email');
-        const service = formData.get('service');
-        const message = formData.get('message');
-        
-        // Simple validation
-        if (!name || !email || !service || !message) {
-            showNotification('Please fill in all fields', 'error');
-            return;
-        }
-        
-        // Simulate form submission
-        showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
-        this.reset();
-        
-        // Reset custom select
-        const selectSelected = document.querySelector('.select-selected');
-        const hiddenInput = document.querySelector('input[name="service"]');
-        if (selectSelected && hiddenInput) {
-            selectSelected.textContent = 'Select Service';
-            hiddenInput.value = '';
-            hiddenInput.removeAttribute('data-selected');
-        }
-    });
-}
-
-// Stats Counter Animation
-function initStatsCounter() {
-    const statNumbers = document.querySelectorAll('.stat-number');
-    
-    statNumbers.forEach(stat => {
-        const target = parseInt(stat.getAttribute('data-target'));
-        const duration = 2000; // 2 seconds
-        const increment = target / (duration / 16); // 60fps
-        let current = 0;
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= target) {
-                            current = target;
-                            clearInterval(timer);
-                        }
-                        stat.textContent = Math.floor(current);
-                    }, 16);
-                    observer.unobserve(entry.target);
-                }
-            });
-        });
-        
-        observer.observe(stat);
-    });
-}
-
-// Skill Bars Animation
-function initSkillBars() {
-    const skillBars = document.querySelectorAll('.skill-progress');
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const bar = entry.target;
-                const width = bar.getAttribute('data-width');
-                
-                gsap.to(bar, {
-                    width: width,
-                    duration: 1.5,
-                    ease: "power2.out",
-                    delay: 0.2
-                });
-                
-                observer.unobserve(bar);
-            }
-        });
-    });
-    
-    skillBars.forEach(bar => observer.observe(bar));
-}
-
-// Notification System
-function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notification => notification.remove());
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        z-index: 10000;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
-        max-width: 300px;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Close button functionality
-    const closeBtn = notification.querySelector('.notification-close');
-    closeBtn.addEventListener('click', () => {
-        notification.style.transform = 'translateX(400px)';
-        setTimeout(() => notification.remove(), 300);
-    });
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.transform = 'translateX(400px)';
-            setTimeout(() => notification.remove(), 300);
-        }
-    }, 5000);
-}
-
-// Cursor Effects (Optional Enhancement)
-function initCursorEffects() {
-    const cursor = document.createElement('div');
-    cursor.className = 'custom-cursor';
-    cursor.style.cssText = `
-        position: fixed;
-        width: 20px;
-        height: 20px;
-        background: radial-gradient(circle, #ffd700, transparent);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        mix-blend-mode: difference;
-        transition: transform 0.1s ease;
-    `;
-    document.body.appendChild(cursor);
-    
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX - 10 + 'px';
-        cursor.style.top = e.clientY - 10 + 'px';
-    });
-    
-    // Scale cursor on hover over interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .service-card');
-    interactiveElements.forEach(element => {
-        element.addEventListener('mouseenter', () => {
-            cursor.style.transform = 'scale(2)';
-        });
-        element.addEventListener('mouseleave', () => {
-            cursor.style.transform = 'scale(1)';
-        });
-    });
-}
-
-// Initialize cursor effects on desktop only
-if (window.innerWidth > 768) {
-    initCursorEffects();
-}
-
-// Parallax Effect for Background Elements
-function initParallaxEffects() {
-    const parallaxElements = document.querySelectorAll('.gradient-orb');
-    
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
-        
-        parallaxElements.forEach((element, index) => {
-            const speed = (index + 1) * 0.3;
-            element.style.transform = `translateY(${rate * speed}px)`;
-        });
-    });
-}
-
-initParallaxEffects();
-
-// Performance optimization: Throttle scroll events
-function throttle(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Apply throttling to scroll events
-const throttledScrollHandler = throttle(() => {
-    // Any scroll-based animations or effects
-}, 16); // ~60fps
-
-window.addEventListener('scroll', throttledScrollHandler);
+// Scroll event listener for any future scroll-based animations
+window.addEventListener('scroll', () => {
+    // Add scroll-based animations here if needed
+});
