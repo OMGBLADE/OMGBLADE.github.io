@@ -4,27 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeWebsite() {
-    // Initialize smooth scrolling
+    // Initialize all components
     initSmoothScrolling();
-    
-    // Initialize loading screen
     initLoadingScreen();
-    
-    // Initialize navigation
     initNavigation();
-    
-    // Initialize animated icons
     initAnimatedIcons();
-    
-    // Initialize typewriter effect
     initTypewriterEffect();
-    
-    // Initialize animations
     initScrollAnimations();
-    
-    // Initialize portfolio filters
     initPortfolioFilters();
-    
+    initCustomSelect();
     // Initialize testimonials slider
     initTestimonialsSlider();
     
@@ -36,6 +24,108 @@ function initializeWebsite() {
     
     // Initialize skill bars
     initSkillBars();
+    
+    // Initialize portfolio videos
+    initPortfolioVideos();
+}
+
+// Portfolio Video Controls
+function initPortfolioVideos() {
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    let hoverTimeout;
+    
+    portfolioItems.forEach(item => {
+        const videoContainer = item.querySelector('.video-container');
+        const video = item.querySelector('.portfolio-video');
+        const playButton = item.querySelector('.video-play-btn');
+        const soundButton = item.querySelector('.video-sound-btn');
+        
+        if (video && playButton && soundButton) {
+            // Mute video by default
+            video.muted = true;
+            
+            // Pause all other videos when one is playing
+            const allVideos = document.querySelectorAll('.portfolio-video');
+            
+            // Play/Pause button click handler
+            playButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleVideoPlayback(video, playButton);
+            });
+            
+            // Sound toggle button click handler
+            soundButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                video.muted = !video.muted;
+                const icon = soundButton.querySelector('i');
+                icon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            });
+            
+            // Hover to play (with delay to prevent accidental triggers)
+            videoContainer.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = setTimeout(() => {
+                    if (video.paused) {
+                        pauseAllVideos();
+                        video.play().catch(e => console.log('Autoplay prevented:', e));
+                        updatePlayButton(playButton, false);
+                    }
+                }, 300);
+            });
+            
+            videoContainer.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimeout);
+                if (!video.paused) {
+                    video.pause();
+                    video.currentTime = 0;
+                    updatePlayButton(playButton, true);
+                }
+            });
+            
+            // Handle video end
+            video.addEventListener('ended', () => {
+                video.currentTime = 0;
+                updatePlayButton(playButton, true);
+            });
+            
+            // Click to play/pause
+            videoContainer.addEventListener('click', (e) => {
+                if (e.target === video) {
+                    toggleVideoPlayback(video, playButton);
+                }
+            });
+        }
+    });
+    
+    // Helper functions
+    function toggleVideoPlayback(video, playButton) {
+        if (video.paused) {
+            pauseAllVideos(video);
+            video.play().catch(e => console.log('Play failed:', e));
+            updatePlayButton(playButton, false);
+        } else {
+            video.pause();
+            updatePlayButton(playButton, true);
+        }
+    }
+    
+    function updatePlayButton(button, isPaused) {
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.className = isPaused ? 'fas fa-play' : 'fas fa-pause';
+        }
+    }
+    
+    function pauseAllVideos(exceptVideo = null) {
+        document.querySelectorAll('.portfolio-video').forEach(v => {
+            if (v !== exceptVideo && !v.paused) {
+                v.pause();
+                v.currentTime = 0;
+                const btn = v.closest('.portfolio-item').querySelector('.video-play-btn');
+                if (btn) updatePlayButton(btn, true);
+            }
+        });
+    }
 }
 
 // Smooth Scrolling with Lenis
@@ -461,36 +551,128 @@ function handleSwipe() {
     }
 }
 
+// Custom Select Dropdown
+function initCustomSelect() {
+    console.log('Initializing custom select...');
+    const customSelect = document.querySelector('.custom-select');
+    
+    if (!customSelect) {
+        console.log('Custom select not found');
+        return;
+    }
+    
+    const selected = customSelect.querySelector('.select-selected');
+    const items = customSelect.querySelector('.select-items');
+    const hiddenInput = customSelect.parentElement.querySelector('input[type="hidden"]');
+    
+    console.log('Elements found:', { selected, items, hiddenInput });
+    
+    if (!selected || !items) {
+        console.log('Required elements not found');
+        return;
+    }
+    
+    // Remove any existing event listeners by cloning the element
+    const newSelected = selected.cloneNode(true);
+    selected.parentNode.replaceChild(newSelected, selected);
+    
+    // Click handler for the select box
+    newSelected.addEventListener('click', function(e) {
+        console.log('Dropdown clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Force show/hide the dropdown
+        if (items.style.display === 'none' || items.classList.contains('select-hide')) {
+            console.log('Opening dropdown');
+            items.style.display = 'block';
+            items.classList.remove('select-hide');
+            newSelected.classList.add('select-arrow-active');
+        } else {
+            console.log('Closing dropdown');
+            items.style.display = 'none';
+            items.classList.add('select-hide');
+            newSelected.classList.remove('select-arrow-active');
+        }
+    });
+    
+    // Click handlers for options
+    items.querySelectorAll('div').forEach(option => {
+        option.addEventListener('click', function(e) {
+            console.log('Option clicked:', this.textContent);
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const value = this.getAttribute('data-value');
+            const text = this.textContent;
+            
+            // Update display and hidden input
+            newSelected.textContent = text;
+            if (hiddenInput) {
+                hiddenInput.value = value;
+            }
+            
+            // Close dropdown
+            items.style.display = 'none';
+            items.classList.add('select-hide');
+            newSelected.classList.remove('select-arrow-active');
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!customSelect.contains(e.target)) {
+            items.style.display = 'none';
+            items.classList.add('select-hide');
+            newSelected.classList.remove('select-arrow-active');
+        }
+    });
+    
+    console.log('Custom select initialized successfully');
+}
+
+function closeAllSelect(elmnt) {
+    const items = document.querySelectorAll('.select-items');
+    const selected = document.querySelectorAll('.select-selected');
+    
+    items.forEach((item, index) => {
+        if (elmnt !== item.parentElement) {
+            item.classList.add('select-hide');
+            selected[index].classList.remove('select-arrow-active');
+        }
+    });
+}
+
 // Contact Form
 function initContactForm() {
-    const form = document.querySelector('.contact-form');
-    
-    form.addEventListener('submit', (e) => {
+    document.querySelector('.contact-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
         // Get form data
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
+        const formData = new FormData(this);
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const service = formData.get('service');
+        const message = formData.get('message');
         
         // Simple validation
-        if (!data.name || !data.email || !data.message) {
-            showNotification('Please fill in all required fields.', 'error');
+        if (!name || !email || !service || !message) {
+            showNotification('Please fill in all fields', 'error');
             return;
         }
         
         // Simulate form submission
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
+        showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
+        this.reset();
         
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        setTimeout(() => {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            form.reset();
-            showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
-        }, 2000);
+        // Reset custom select
+        const selectSelected = document.querySelector('.select-selected');
+        const hiddenInput = document.querySelector('input[name="service"]');
+        if (selectSelected && hiddenInput) {
+            selectSelected.textContent = 'Select Service';
+            hiddenInput.value = '';
+            hiddenInput.removeAttribute('data-selected');
+        }
     });
 }
 
