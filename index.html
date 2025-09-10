@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OMGBLADE - Creative Portfolio</title>
     <meta name="description" content="Professional Video Editor, Graphic Designer & Videographer - 5-star rated freelancer">
+    <link rel="canonical" href="https://omgblade.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="OMGBLADE - Creative Portfolio">
+    <meta property="og:description" content="Professional Video Editor, Graphic Designer & Videographer - 5-star rated freelancer">
+    <meta property="og:url" content="https://omgblade.github.io/">
+    <meta property="og:image" content="https://omgblade.github.io/Data/profile.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OMGBLADE - Creative Portfolio">
+    <meta name="twitter:description" content="Professional Video Editor, Graphic Designer & Videographer - 5-star rated freelancer">
+    <meta name="twitter:image" content="https://omgblade.github.io/Data/profile.jpg">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Audiowide:wght@400&family=Orbitron:wght@400;700;900&family=Righteous&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -25,8 +35,8 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="icon" href="Data/profile.jpg">
+    <link rel="apple-touch-icon" href="Data/profile.jpg">
     
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -36,6 +46,9 @@
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
     
     <link rel="stylesheet" href="styles.css">
+    <!-- Video.js & Playlist UI (premade player) -->
+    <link href="https://vjs.zencdn.net/8.13.0/video-js.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/videojs-playlist-ui/5.0.0/videojs-playlist-ui.css" rel="stylesheet">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -104,7 +117,7 @@
                 <div class="hero-visual">
                     <div class="profile-container">
                         <div class="profile-image">
-                            <img src="/Data/profile.jpg" alt="OMGBLADE Profile" id="profile-img">
+                            <img src="Data/profile.jpg" alt="OMGBLADE Profile" id="profile-img">
                             <div class="profile-ring"></div>
                         </div>
                         <br><br><br>
@@ -160,7 +173,7 @@
                         
                         <div class="stats">
                             <div class="stat">
-                                <span class="stat-number" data-target="50 Plus">50+</span>
+                                <span class="stat-number" data-target="50">50+</span>
                                 <span class="stat-label">Projects Completed</span>
                             </div>
                             <div class="stat">
@@ -290,8 +303,8 @@
                 <div class="portfolio-item" data-category="video">
                     <div class="portfolio-image">
                         <div class="video-container">
-                            <video class="portfolio-video" loop playsinline>
-                                <source src="/Data/videos/Videoedit1.mp4" type="video/mp4">
+                            <video class="portfolio-video" loop playsinline preload="metadata" muted webkit-playsinline>
+                                <source src="./Data/videos/Videoedit1.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="video-controls">
@@ -326,13 +339,24 @@
                 
                 <div class="portfolio-item" data-category="videography">
                     <div class="portfolio-image">
-                        <img src="/Data/videos/videography1.mp4" alt="Videography Project 1">
-                        <div class="portfolio-overlay">
-                            <div class="portfolio-content">
-                                <h4>Event Documentation</h4>
-                                <p>Capturing memorable moments</p>
-                                <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
+                        <div class="video-container">
+                            <video class="portfolio-video" loop playsinline preload="auto" muted webkit-playsinline x-webkit-airplay="allow" x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait">
+                                <source src="Data/videos/videography1.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="video-controls">
+                                <button class="video-play-btn" aria-label="Play/Pause">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="video-sound-btn" aria-label="Toggle Sound">
+                                    <i class="fas fa-volume-mute"></i>
+                                </button>
                             </div>
+                        </div>
+                        <div class="portfolio-content">
+                            <h4>Event Documentation</h4>
+                            <p>Capturing memorable moments</p>
+                            <a href="#" class="portfolio-link"><i class="fas fa-external-link-alt"></i></a>
                         </div>
                     </div>
                 </div>
@@ -595,6 +619,23 @@
         </div>
     </footer>
 
+    <!-- Media Player Modal (Video.js) -->
+    <div id="media-player-overlay" class="media-player-overlay" aria-hidden="true">
+        <div class="media-player" role="dialog" aria-modal="true" aria-label="Media Player">
+            <button class="mp-close" id="mpClose" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="mp-vjs-layout">
+                <video id="mpVjs" class="video-js vjs-default-skin" controls preload="metadata" playsinline></video>
+                <div class="mp-playlist vjs-playlist vjs-playlist-horizontal" id="vjsPlaylist"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video.js & Playlist scripts -->
+    <script src="https://vjs.zencdn.net/8.13.0/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-playlist/5.0.0/videojs-playlist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-playlist-ui/5.0.0/videojs-playlist-ui.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,164 +1,377 @@
-// Initialize everything when DOM is loaded
+// Test function to verify video loading
+function testVideoLoading() {
+	return new Promise((resolve) => {
+		const testVideo = document.createElement('video');
+		testVideo.src = 'Data/videos/Videoedit1.mp4';
+		testVideo.muted = false;
+		testVideo.playsInline = true;
+		testVideo.preload = 'metadata';
+		testVideo.autoplay = false;
+		testVideo.setAttribute('playsinline', '');
+		testVideo.setAttribute('webkit-playsinline', '');
+		testVideo.style.display = 'none';
+		
+		testVideo.addEventListener('loadedmetadata', () => {
+			console.log('Video metadata loaded successfully');
+			resolve(true);
+			testVideo.remove();
+		});
+		
+		testVideo.addEventListener('error', (e) => {
+			console.error('Video loading error:', e);
+			resolve(false);
+			testVideo.remove();
+		});
+		
+		document.body.appendChild(testVideo);
+	});
+}
+
+// Initialize everything when the page is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializeWebsite();
+	console.log('DOM loaded, initializing website...');
+	
+	// Initialize the website
+	initializeWebsite();
+	
+	// Test if videos can be loaded
+	testVideoLoading().then(success => {
+		console.log('Video loading test:', success ? 'Success' : 'Failed');
+	});
 });
 
 function initializeWebsite() {
-    // Initialize all components
-    initSmoothScrolling();
-    initLoadingScreen();
-    initNavigation();
-    initAnimatedIcons();
-    initTypewriterEffect();
-    initScrollAnimations();
-    initPortfolioFilters();
-    initCustomSelect();
-    // Initialize testimonials slider
-    initTestimonialsSlider();
-    
-    // Initialize contact form
-    initContactForm();
-    
-    // Initialize stats counter
-    initStatsCounter();
-    
-    // Initialize skill bars
-    initSkillBars();
-    
-    // Initialize portfolio videos
-    initPortfolioVideos();
+	// Initialize all components
+	initSmoothScrolling();
+	initLoadingScreen();
+	initNavigation();
+	initAnimatedIcons();
+	initTypewriterEffect();
+	initScrollAnimations();
+	initPortfolioFilters();
+	initCustomSelect();
+	// Initialize testimonials slider
+	initTestimonialsSlider();
+	
+	// Initialize contact form
+	initContactForm();
+	
+	// Initialize stats counter
+	initStatsCounter();
+	
+	// Initialize skill bars
+	initSkillBars();
+	
+	// Initialize portfolio videos after the page is fully loaded
+	window.addEventListener('load', function() {
+		initPortfolioVideos();
+		initVideoJsPlayer();
+	});
 }
 
 // Portfolio Video Controls
 function initPortfolioVideos() {
-    const portfolioItems = document.querySelectorAll('.portfolio-item');
-    let hoverTimeout;
-    
-    portfolioItems.forEach(item => {
-        const videoContainer = item.querySelector('.video-container');
-        const video = item.querySelector('.portfolio-video');
-        const playButton = item.querySelector('.video-play-btn');
-        const soundButton = item.querySelector('.video-sound-btn');
-        
-        if (video && playButton && soundButton) {
-            // Mute video by default
-            video.muted = true;
-            
-            // Pause all other videos when one is playing
-            const allVideos = document.querySelectorAll('.portfolio-video');
-            
-            // Play/Pause button click handler
-            playButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleVideoPlayback(video, playButton);
-            });
-            
-            // Sound toggle button click handler
-            soundButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                video.muted = !video.muted;
-                const icon = soundButton.querySelector('i');
-                icon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            });
-            
-            // Hover to play (with delay to prevent accidental triggers)
-            videoContainer.addEventListener('mouseenter', () => {
-                clearTimeout(hoverTimeout);
-                hoverTimeout = setTimeout(() => {
-                    if (video.paused) {
-                        pauseAllVideos();
-                        video.play().catch(e => console.log('Autoplay prevented:', e));
-                        updatePlayButton(playButton, false);
-                    }
-                }, 300);
-            });
-            
-            videoContainer.addEventListener('mouseleave', () => {
-                clearTimeout(hoverTimeout);
-                if (!video.paused) {
-                    video.pause();
-                    video.currentTime = 0;
-                    updatePlayButton(playButton, true);
-                }
-            });
-            
-            // Handle video end
-            video.addEventListener('ended', () => {
-                video.currentTime = 0;
-                updatePlayButton(playButton, true);
-            });
-            
-            // Click to play/pause
-            videoContainer.addEventListener('click', (e) => {
-                if (e.target === video) {
-                    toggleVideoPlayback(video, playButton);
-                }
-            });
-        }
-    });
-    
-    // Helper functions
-    function toggleVideoPlayback(video, playButton) {
-        if (video.paused) {
-            pauseAllVideos(video);
-            video.play().catch(e => console.log('Play failed:', e));
-            updatePlayButton(playButton, false);
-        } else {
-            video.pause();
-            updatePlayButton(playButton, true);
-        }
-    }
-    
-    function updatePlayButton(button, isPaused) {
-        const icon = button.querySelector('i');
-        if (icon) {
-            icon.className = isPaused ? 'fas fa-play' : 'fas fa-pause';
-        }
-    }
-    
-    function pauseAllVideos(exceptVideo = null) {
-        document.querySelectorAll('.portfolio-video').forEach(v => {
-            if (v !== exceptVideo && !v.paused) {
-                v.pause();
-                v.currentTime = 0;
-                const btn = v.closest('.portfolio-item').querySelector('.video-play-btn');
-                if (btn) updatePlayButton(btn, true);
-            }
-        });
-    }
+	console.log('Initializing portfolio videos...');
+	const portfolioItems = document.querySelectorAll('.portfolio-item');
+	
+	// Configure all videos
+	document.querySelectorAll('.portfolio-video').forEach((video, index) => {
+		// Basic video setup
+		video.autoplay = false;
+		video.preload = 'metadata';
+		video.muted = true; // Start muted
+		video.controls = false;
+		video.playsInline = true;
+		
+		// Ensure video is not preloaded too early
+		video.load();
+		
+		// Log video source for debugging
+		console.log(`Video ${index + 1} source:`, video.querySelector('source')?.src);
+	});
+	
+	// Helper: update play button state
+	function updatePlayButton(button, isPaused) {
+		if (!button) return;
+		const icon = button.querySelector('i');
+		if (icon) icon.className = isPaused ? 'fas fa-play' : 'fas fa-pause';
+	}
+	
+	// Helper: update sound icon based on mute state
+	function updateSoundButton(button, muted) {
+		if (!button) return;
+		const icon = button.querySelector('i');
+		if (icon) icon.className = muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+	}
+	
+	// Function to handle video play/pause
+	function toggleVideoPlayback(video, playButton) {
+		if (video.paused) {
+			// Pause all other videos
+			document.querySelectorAll('.portfolio-video').forEach(v => {
+				if (v !== video && !v.paused) {
+					v.pause();
+					v.currentTime = 0;
+					v.classList.remove('playing');
+					const btn = v.closest('.portfolio-item')?.querySelector('.video-play-btn');
+					if (btn) updatePlayButton(btn, true);
+				}
+			});
+			
+			// Play the clicked video
+			video.play().then(() => {
+				video.classList.add('playing');
+				if (playButton) updatePlayButton(playButton, false);
+			}).catch(error => {
+				console.error('Error playing video:', error);
+				// Fallback: Show native controls if playback fails
+				video.controls = true;
+			});
+		} else {
+			video.pause();
+			video.currentTime = 0;
+			video.classList.remove('playing');
+			if (playButton) updatePlayButton(playButton, true);
+		}
+	}
+	
+	// Wire events for each portfolio item
+	portfolioItems.forEach(item => {
+		const video = item.querySelector('.portfolio-video');
+		const playBtn = item.querySelector('.video-play-btn');
+		const soundBtn = item.querySelector('.video-sound-btn');
+		if (!video) return;
+		
+		// Initial sound icon state
+		updateSoundButton(soundBtn, video.muted);
+		
+		// Play button
+		if (playBtn) {
+			playBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				// Allow unmute on user gesture
+				if (video.muted) video.muted = false;
+				updateSoundButton(soundBtn, video.muted);
+				toggleVideoPlayback(video, playBtn);
+			});
+		}
+		
+		// Sound toggle button
+		if (soundBtn) {
+			soundBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				video.muted = !video.muted;
+				updateSoundButton(soundBtn, video.muted);
+			});
+		}
+		
+		// Sync buttons on playback events
+		video.addEventListener('play', () => {
+			video.classList.add('playing');
+			updatePlayButton(playBtn, false);
+		});
+		video.addEventListener('pause', () => {
+			video.classList.remove('playing');
+			updatePlayButton(playBtn, true);
+		});
+		video.addEventListener('ended', () => {
+			video.currentTime = 0;
+			video.classList.remove('playing');
+			updatePlayButton(playBtn, true);
+		});
+		video.addEventListener('error', () => {
+			console.error('Video error:', video.error);
+		});
+	});
 }
 
-// Smooth Scrolling with Lenis
-function initSmoothScrolling() {
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        direction: 'vertical',
-        gestureDirection: 'vertical',
-        smooth: true,
-        mouseMultiplier: 1,
-        smoothTouch: false,
-        touchMultiplier: 2,
-        infinite: false,
+// Global Media Player with Playlist
+function initVideoJsPlayer() {
+    const overlay = document.getElementById('media-player-overlay');
+    const closeBtn = document.getElementById('mpClose');
+    const vjsEl = document.getElementById('mpVjs');
+    const playlistContainer = document.getElementById('vjsPlaylist');
+    if (!overlay || !vjsEl) return;
+
+    // Collect sources from portfolio videos
+    const items = Array.from(document.querySelectorAll('.portfolio-item'));
+    const videos = items.map((item) => {
+        const source = item.querySelector('.portfolio-video source');
+        const title = item.querySelector('.portfolio-content h4')?.textContent?.trim() || 'Untitled';
+        const src = source?.getAttribute('src');
+        return src ? { name: title, sources: [{ src, type: 'video/mp4' }] } : null;
+    }).filter(Boolean);
+
+    if (videos.length === 0) return;
+
+    // Initialize player
+    const player = window.videojs(vjsEl, {
+        controls: true,
+        preload: 'metadata',
+        fluid: true,
+        playbackRates: [0.5, 1, 1.25, 1.5, 2],
     });
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
+    if (window.videojsPlaylist) {
+        player.playlist(videos);
+        if (playlistContainer && window.videojsPlaylistUi) {
+            player.playlistUi({ el: playlistContainer });
+        }
     }
 
-    requestAnimationFrame(raf);
+    function openOverlay(index) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (player.playlist && typeof index === 'number') {
+            player.playlist.currentItem(index);
+        }
+        player.play();
+    }
 
-    // Handle anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    function closeOverlay() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        player.pause();
+    }
+
+    // Wire open triggers
+    items.forEach((item, idx) => {
+        const triggerEls = item.querySelectorAll('.video-container, .portfolio-image');
+        triggerEls.forEach(el => el.addEventListener('click', (e) => {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                lenis.scrollTo(target, { offset: -80 });
-            }
-        });
+            openOverlay(idx);
+        }));
     });
+
+    // Close
+    closeBtn?.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+
+    // Esc
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeOverlay();
+    });
+}
+
+// Global delegated handlers as a safety net for play/sound buttons
+document.addEventListener('click', (e) => {
+	const playBtn = e.target.closest && e.target.closest('.video-play-btn');
+	if (playBtn) {
+		e.preventDefault();
+		e.stopPropagation();
+		const item = playBtn.closest('.portfolio-item');
+		const video = item && item.querySelector && item.querySelector('.portfolio-video');
+		const soundBtn = item && item.querySelector && item.querySelector('.video-sound-btn');
+		if (!video) return;
+		if (video.paused) {
+			// Allow sound on user gesture
+			if (video.muted) video.muted = false;
+			if (typeof updateSoundButton === 'function') {
+				updateSoundButton(soundBtn, video.muted);
+			} else if (soundBtn) {
+				const sIcon = soundBtn.querySelector('i');
+				if (sIcon) sIcon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+			}
+			video.play().then(() => {
+				video.classList.add('playing');
+				if (typeof updatePlayButton === 'function') {
+					updatePlayButton(playBtn, false);
+				} else {
+					const icon = playBtn.querySelector('i');
+					if (icon) icon.className = 'fas fa-pause';
+				}
+			}).catch(() => {
+				video.controls = true;
+			});
+		} else {
+			video.pause();
+			video.currentTime = 0;
+			video.classList.remove('playing');
+			const icon = playBtn.querySelector('i');
+			if (icon) icon.className = 'fas fa-play';
+		}
+		return;
+	}
+	const soundBtn = e.target.closest && e.target.closest('.video-sound-btn');
+	if (soundBtn) {
+		e.preventDefault();
+		e.stopPropagation();
+		const item = soundBtn.closest('.portfolio-item');
+		const video = item && item.querySelector && item.querySelector('.portfolio-video');
+		if (!video) return;
+		video.muted = !video.muted;
+		if (typeof updateSoundButton === 'function') {
+			updateSoundButton(soundBtn, video.muted);
+		} else {
+			const icon = soundBtn.querySelector('i');
+			if (icon) icon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+		}
+		return;
+	}
+	const videoEl = e.target.closest && e.target.closest('.portfolio-video');
+	if (videoEl) {
+		e.preventDefault();
+		e.stopPropagation();
+		const item = videoEl.closest('.portfolio-item');
+		const playButton = item && item.querySelector && item.querySelector('.video-play-btn');
+		if (videoEl.paused) {
+			videoEl.play().then(() => {
+				videoEl.classList.add('playing');
+				if (playButton) {
+					const icon = playButton.querySelector('i');
+					if (icon) icon.className = 'fas fa-pause';
+				}
+			}).catch(() => {
+				videoEl.controls = true;
+			});
+		} else {
+			videoEl.pause();
+			videoEl.currentTime = 0;
+			videoEl.classList.remove('playing');
+			if (playButton) {
+				const icon = playButton.querySelector('i');
+				if (icon) icon.className = 'fas fa-play';
+			}
+		}
+	}
+});
+
+// Smooth Scrolling
+function initSmoothScrolling() {
+    // Fallback to native smooth scrolling if Lenis is not available
+    if (typeof Lenis !== 'undefined') {
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            smooth: true,
+            smoothTouch: false,
+            touchMultiplier: 2,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+    } else {
+        // Native smooth scrolling as fallback
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = this.getAttribute('href');
+                if (target !== '#') {
+                    document.querySelector(target)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
 }
 
 // Loading Screen
@@ -861,20 +1074,3 @@ const throttledScrollHandler = throttle(() => {
 }, 16); // ~60fps
 
 window.addEventListener('scroll', throttledScrollHandler);
-
-// Preload images for better performance
-function preloadImages() {
-    const images = [
-        'https://via.placeholder.com/300x300/1a1a1a/gold?text=Your+Photo',
-        'https://via.placeholder.com/400x300/1a1a1a/gold?text=Video+Project+1',
-        'https://via.placeholder.com/400x300/1a1a1a/4A90E2?text=Design+Project+1'
-        // Add more image URLs as needed
-    ];
-    
-    images.forEach(src => {
-        const img = new Image();
-        img.src = src;
-    });
-}
-
-preloadImages();
