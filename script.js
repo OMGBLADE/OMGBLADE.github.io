@@ -492,6 +492,89 @@ document.addEventListener('DOMContentLoaded', function() {
     updateActiveLink(); // Run once on load
 });
 
+// Contact Form Handling
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.querySelector('.contact-form');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            // Send email using EmailJS
+            emailjs.sendForm('service_b5h88wi', 'template_dmnf8kz', this, 'eSpbNKt_ONfqAu42u')
+                .then((result) => {
+                    // Show success message
+                    showNotification('Message sent successfully!', 'success');
+                    contactForm.reset();
+                }, (error) => {
+                    // Show error message
+                    showNotification('Failed to send message. Please try again.', 'error');
+                    console.error('EmailJS Error:', error);
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                });
+        });
+    }
+});
+
+// Show notification function
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Add styles if not already added
+    if (!document.getElementById('notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 5px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(120%);
+                transition: transform 0.3s ease-in-out;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .notification.success {
+                background: #4CAF50;
+            }
+            .notification.error {
+                background: #F44336;
+            }
+            .notification.show {
+                transform: translateX(0);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
 // Smooth Scrolling
 function initSmoothScrolling() {
     // Fallback to native smooth scrolling if Lenis is not available
