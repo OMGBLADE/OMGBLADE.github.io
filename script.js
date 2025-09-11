@@ -48,7 +48,9 @@ function initializeWebsite() {
 	initAnimatedIcons();
 	initTypewriterEffect();
 	initScrollAnimations();
+	initProgressBars();
 	initPortfolioFilters();
+	initVideoHandling();
 	
 	// Initialize portfolio videos after the page is fully loaded
 	window.addEventListener('load', function() {
@@ -334,6 +336,77 @@ document.addEventListener('click', (e) => {
 		}
 	}
 });
+
+// Lazy load and video handling
+function initVideoHandling() {
+    const videoContainers = document.querySelectorAll('.video-container');
+    
+    // Create intersection observer for lazy loading
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const container = entry.target;
+                container.classList.add('visible');
+                observer.unobserve(container);
+            }
+        });
+    }, {
+        rootMargin: '200px', // Start loading when within 200px of viewport
+        threshold: 0.1
+    });
+
+    // Initialize video containers
+    videoContainers.forEach(container => {
+        // Observe each container
+        observer.observe(container);
+        
+        // Click handler for video playback
+        container.addEventListener('click', function() {
+            const videoSrc = this.getAttribute('data-src');
+            if (!videoSrc) return;
+            
+            // Create video element if it doesn't exist
+            if (!this.querySelector('video')) {
+                const video = document.createElement('video');
+                video.src = videoSrc;
+                video.controls = true;
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.preload = 'metadata'; // Only load metadata initially
+                
+                // Replace thumbnail with video
+                const thumbnail = this.querySelector('.video-thumbnail');
+                const playIcon = this.querySelector('.play-icon');
+                if (thumbnail) thumbnail.style.display = 'none';
+                if (playIcon) playIcon.style.display = 'none';
+                
+                this.appendChild(video);
+                
+                // Play video
+                video.play().catch(error => {
+                    console.error('Video playback failed:', error);
+                });
+            }
+        });
+        
+        // Pause video when it's out of view
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target.querySelector('video');
+                if (video) {
+                    if (entry.isIntersecting) {
+                        video.play().catch(e => console.log('Autoplay prevented:', e));
+                    } else {
+                        video.pause();
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        videoObserver.observe(container);
+    });
+}
 
 // Smooth Scrolling
 function initSmoothScrolling() {
@@ -703,7 +776,7 @@ function updateSlider(index, direction = 'next') {
     
     // Update progress bar
     if (progressBar) {
-        const progressWidth = ((index + 1) / testimonials.length) * 100;
+        const progressWidth = ((index + 1) / testimonials.length) * 50;
         progressBar.style.width = `${progressWidth}%`;
     }
 }
@@ -752,6 +825,54 @@ function resetAutoSlide() {
 
 // Initialize slider
 updateSlider(0);
+
+// Progress Bars Animation
+function initProgressBars() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    
+    if (!progressBars.length) return;
+
+    // Reset all progress bars to 0 initially
+    progressBars.forEach(bar => {
+        bar.style.width = '0';
+        bar.style.setProperty('--progress-width', bar.getAttribute('data-level') + '%');
+    });
+
+    // Create an Intersection Observer to detect when the tools section is in view
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Animate each progress bar with a slight delay between them
+                progressBars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.classList.add('animate');
+                    }, index * 200); // Stagger the animations
+                });
+                
+                // Unobserve after animation to prevent re-triggering
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.2, // Trigger when 20% of the section is visible
+        rootMargin: '0px 0px -50px 0px' // Adjust this value as needed
+    });
+
+    // Observe the tools section
+    const toolsSection = document.querySelector('.tools-section');
+    if (toolsSection) {
+        observer.observe(toolsSection);
+    }
+    
+    // Fallback in case IntersectionObserver is not supported
+    if (!('IntersectionObserver' in window)) {
+        progressBars.forEach((bar, index) => {
+            setTimeout(() => {
+                bar.classList.add('animate');
+            }, index * 200);
+        });
+    }
+}
 
 // Add hover effects for testimonial cards
 testimonials.forEach((card, index) => {
