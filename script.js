@@ -414,6 +414,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
     
+    // Add index to each nav item for staggered animation
+    navLinks.forEach((link, index) => {
+        link.parentElement.style.setProperty('--i', index);
+    });
+    
     // Toggle mobile menu
     function toggleMenu() {
         const isExpanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
@@ -439,15 +444,34 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleMenu();
         });
         
-        // Close menu when clicking on nav links
+        // Close menu when clicking on a nav link (mobile only)
         navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                // Remove active class from all links
-                navLinks.forEach(l => l.classList.remove('active'));
-                // Add active class to clicked link
-                this.classList.add('active');
-                closeMenu();
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 992) {
+                    closeMenu();
+                }
             });
+        });
+        
+        // Close menu when clicking outside (mobile only)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992 && 
+                navMenu.classList.contains('active') && 
+                !e.target.closest('.nav-menu') && 
+                !e.target.closest('.hamburger')) {
+                closeMenu();
+            }
+        });
+        
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth > 992) {
+                    closeMenu();
+                }
+            }, 250);
         });
         
         // Close menu when clicking outside
@@ -638,20 +662,6 @@ function initNavigation() {
         } else {
             navbar.style.background = 'rgba(10, 10, 10, 0.95)';
         }
-    });
-    
-    // Mobile menu toggle
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-    });
-    
-    // Close mobile menu when clicking on a link
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
     });
 }
 
